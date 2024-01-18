@@ -11,5 +11,8 @@
   "license": "ISC",
   "devDependencies": {
     "ts-node": "^10.9.2"
+  },
+  "dependencies": {
+    "js-base64": "^3.7.5"
   }
 }
