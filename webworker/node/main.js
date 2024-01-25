@@ -1,6 +1,6 @@
 import { Worker } from 'node:worker_threads'
 
-const num = 10000000000
+const num = 1000000000
 const worker = new Worker('./worker.js')
 worker.postMessage(num)
 
