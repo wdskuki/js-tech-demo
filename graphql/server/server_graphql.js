@@ -1,5 +1,4 @@
 const { ApolloServer, gql } = require('apollo-server')
-// const promisify = require('node:util.promisify')
 const util = require('node:util');
 
 const db = require('./db')
@@ -29,7 +28,7 @@ db.query = util.promisify(db.query)
 // 定义resolver
 const resolvers = {
   Query: {
-    students: async (root, args) => {
+    students: async () => {
       const list = await db.query('SELECT * FROM t_students')
       console.log(list)
       return list

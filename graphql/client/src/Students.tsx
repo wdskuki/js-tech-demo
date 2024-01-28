@@ -7,6 +7,7 @@ function Students() {
     query {
       students {
         id
+        name
         address
       }
     }

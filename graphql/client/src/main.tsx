@@ -5,7 +5,7 @@ import Student from './Student.tsx'
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
-    <Student />
-    {/* <Students /> */}
+    {/* <Student /> */}
+    <Students />
   </React.StrictMode>,
 )
