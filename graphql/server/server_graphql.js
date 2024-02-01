@@ -33,13 +33,13 @@ const resolvers = {
       console.log(list)
       return list
     },
-    student: async (root, args) => {
-      console.log(root, args)
-      const id = args.id
-      const list = await db.query(`SELECT * FROM t_students WHERE ID=${id}`)
-      console.log('someone')
-      return list[0]
-    }
+    // student: async (root, args) => {
+    //   console.log(root, args)
+    //   const id = args.id
+    //   const list = await db.query(`SELECT * FROM t_students WHERE ID=${id}`)
+    //   console.log('someone')
+    //   return list[0]
+    // }
   }
 }
 
