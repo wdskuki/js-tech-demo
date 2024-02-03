@@ -1,10 +1,14 @@
-// struct Struct {
-//     e: i32,
-// }
 fn main() {
-    let abc: (f32, f32, f32) = (0.1, 0.2, 0.3);
-    let xyz: (f64, f64, f64) = (0.1, 0.2, 0.3);
+    let y = {
+        let x = 3;
+        x + 1
+    };
+    // println!("{}", y);
+    // println!("{}", add(1,2));
 
-    println!("abc (f32)");
-    println!("   0.1 + 0.2: {:x}", (abc.0 + abc.1).to_bits());
+    assert_eq!(add(1,2), ());
+
+}
+
+fn add(x: i32, y: i32){
 }
