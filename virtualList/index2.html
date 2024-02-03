@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      #container {
+        border: 1px solid red;
+        height: 300px;
+        overflow: scroll;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="container">
+      <div id="list">
+      </div>
+    </div>
+  </body>
+  <script>
+    const NUM = 30;
+    let page = 0;
+    let size = 10;
+    let isLoading = false;
+  
+
+    // 原始数据列表
+    const originalList = Array.from({ length: NUM }, (_, i) => i + 1);
+    // 原始数据列表每个元素对应的DOM高度（随机模拟 50px ～ 150px）
+    const originalHeightList = Array.from({ length: NUM }, (v, i) => {
+      return Math.floor(Math.random() * 100 + 50);
+    });
+
+    // 已经加载的数据, 元素类型{value: number, heightL: number}
+    let loadedList = []; 
+
+    // 渲染在页面上的数据，元素类型{value: number}
+    let visibleList = [];
+
+    let totalLoadedHeight = 0;
+    // 原始数据列表总高度
+    // const totalOriginalHeight = originalHeightList.reduce((a, b) => a + b, 0);
+    // 父容器高度
+    const containerHeight = document.getElementById("container").clientHeight;
+    // 父容器监听滚动事件
+    document.getElementById("container").addEventListener("scroll", debounce(scrollHandler, 0));
+
+    // 初始化渲染
+    isLoading = true
+    loadMore().finally(() => {
+      isLoading = false
+      scrollHandler()
+    })
+    // scrollHandler();
+
+    // 父容器滚动事件监听
+    function scrollHandler(e) {
+      if(isLoading) return
+
+      if(isScrollToBottom()) {
+        isLoading = true
+        loadMore().finally(() => {
+          isLoading = false
+        })
+      }
+      let scrollTop = null
+      if(!e) {
+        scrollTo = 0
+      }else {
+        // 滑动过快的话，有可能出现小于0的情况，边界处理
+        scrollTop = e.target.scrollTop < 0 ? 0 : e.target.scrollTop;
+      }
+      
+      let accumulateHeight = 0; // 累计垂直偏移高度
+      let startIndex = null; // 显示在container中的起始下表
+      let endIndex = null; // 显示在container中的结束下标
+      let paddingTop = 0; // 顶部留白高度
+      let paddingBottom = 0; // 底部留白高度
+
+      // 计算startIndex和paddingTop
+      for (let i = 0; i < loadedList.length; i++) {
+        accumulateHeight += loadedList[i].height;
+        if (accumulateHeight > scrollTop) {
+          startIndex = i;
+          paddingTop = accumulateHeight - loadedList[i].height;
+          break;
+        }
+      }
+
+      // 计算endIndex和paddingBottom
+      for (let i = startIndex + 1; i < loadedList.length; i++) {
+        accumulateHeight += loadedList[i].height;
+        // console.log("accumulateHeight", accumulateHeight);
+        if (accumulateHeight >= scrollTop + containerHeight) {
+          endIndex = i;
+          break;
+        }
+      }
+      // 边界情况处理
+      if (endIndex === null) {
+        endIndex = loadedList.length - 1;
+        accumulateHeight = totalLoadedHeight;
+      }
+
+      paddingBottom = totalLoadedHeight - accumulateHeight;
+      console.log(
+        `startIndex = ${startIndex}`, 
+        `endIndex = ${endIndex}`,
+        `paddingTop = ${paddingTop}`,
+        `paddingBottom = ${paddingBottom}`,
+        `scrollTop = ${scrollTop}`,
+        `containerHeight = ${containerHeight}`,
+        `totalLoadedHeight = ${totalLoadedHeight}`
+      );
+      const listElement = document.getElementById("list");
+
+      // 设置paddingTop和paddingBottom
+      listElement.setAttribute("style", "padding-top: " + paddingTop + "px; padding-bottom: " + paddingBottom + "px;");
+      listElement.innerHTML = "";
+      const fragmentElement = document.createDocumentFragment();
+
+      // 将下标从startIndex开始，到endIndex结束的元素渲染到DOM中
+      for (let i = startIndex; i <= endIndex; i++) {
+        const node = document.createElement("div");
+        node.innerText = `value: ${loadedList[i].value}, height: ${loadedList[i].height}`;
+        node.style.height = loadedList[i].height + "px";
+        node.style.border = "1px solid green";
+        fragmentElement.appendChild(node);
+      }
+      listElement.appendChild(fragmentElement);
+    }
+    
+    // 防抖函数
+    function debounce(fn, delay) {
+      let timer = null;
+
+      return function(...args) {
+        if(timer) {
+          clearTimeout(timer);
+          timer = null;
+        }
+        timer = setTimeout(() => {
+          fn.apply(this, args);
+        }, delay)
+      }
+    }
+    
+    // 往上滑动加载更多数据的函数
+    function loadMore() {
+      return new Promise((resolve, reject) => {
+        if(page * size >= originalList.length) {
+          console.error('已经没有更多了')
+          reject()
+        }else {
+          console.warn('加载数据...')
+          setTimeout(() => {
+            const _list = originalList.slice(page * size, (page + 1) * size) 
+            const _height = originalHeightList.slice(page * size, (page + 1) * size)
+            const ret = []
+            _list.forEach((item, index) => {
+              ret.push({value: item, height: _height[index]})
+              totalLoadedHeight += _height[index]
+            })
+            page++
+            render(ret)
+            loadedList = loadedList.concat(ret)
+            resolve()
+          }, Math.random() * 3000);
+        }
+      })
+    }
+
+    // 追加渲染新拉取的数据
+    function render(newList) {
+      const listElement = document.getElementById('list')
+      
+      const fragmentElement = document.createDocumentFragment();
+      newList.forEach(item => {
+        const node = document.createElement("div");
+        node.innerText = `value: ${item.value}, height: ${item.height}`;
+        node.style.height = item.height + "px";
+        node.style.border = "1px solid green";
+        fragmentElement.appendChild(node);
+      })
+      listElement.appendChild(fragmentElement);
+      
+    }
+
+    // 判断是否滑动到底部了
+    function isScrollToBottom() {
+      const outerElement = document.getElementById('container')
+      if(outerElement.scrollTop + outerElement.clientHeight + 50 >= outerElement.scrollHeight) {
+        return true
+      }else {
+        return false
+      }
+    }
+  </script>
+</html>
