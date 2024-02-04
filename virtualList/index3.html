@@ -36,7 +36,7 @@
     const innerElement = document.getElementById('list') // 列表容器元素
     const containerHeight = outerElement.clientHeight; // 外层父容器高度
 
-    // 初始加载原属
+    // 初始加载数据
     loadData()
 
     // 监听外层父容器滚动事件
@@ -65,6 +65,7 @@
     function cacheNodeHeight(list) {
       list.forEach(item => {
         if(!loadedListMap.has(item.id)) {
+          // 从页面上获取对应ID的DOM节点的高度
           const height = document.getElementById(item.id).clientHeight
           loadedListMap.set(item.id, height)
           totalLoadedHeight += height
