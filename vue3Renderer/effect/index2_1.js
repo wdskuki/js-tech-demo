@@ -38,8 +38,14 @@ function effectText1() {
   console.log("effect text 1", obj.text1);
 }
 
+// 定义第二个副作用函数
+function effectText2() {
+  console.log("effect text 2", obj.text2);
+}
+
 // 初始化依次执行副作用函数，触发 get
 effect(effectText1);
+effect(effectText2);
 
 // 模拟2s后修改数据
 setTimeout(() => {
