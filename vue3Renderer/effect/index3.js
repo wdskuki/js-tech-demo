@@ -1,26 +1,26 @@
-/**
- * 响应式原理
- * 1. 创建响应式对象
- * 2. 监听数据变化
- * 3. 触发更新
- * 
- */
-// 原始对象
-const data = {text: 'hello world'};
+// 原始对象,包含两个属性
+const data = {
+  text1: "hello world 1",
+  text2: "hello world 2",
+};
 
-// 存放副作用的集合
-const bucket = new WeakMap()
-let activeEffect = null
-// 副作用函数
+// 存放副作用函数的集合容器。之所以是用Set数据结构，是为了防止相同的副作用函数重复收集
+const bucket = new WeakMap();
+
+// 表示当前正在运行的副作用函数
+let activeEffect = null;
+
+// 用于执行副作用函数的函数
 function effect(fn) {
-  activeEffect = fn
-  fn()
+  activeEffect = fn;
+  fn(); // 执行副作用函数
 }
 
-// 响应式对象
+// 响应式对象。响应式对象为原始对象的Proxy代理
 const obj = new Proxy(data, {
   get(target, key) {
     if(!activeEffect) return target[key]
+
     let depsMap = bucket.get(target)
     if(!depsMap) {
       depsMap = new Map()
@@ -32,23 +32,34 @@ const obj = new Proxy(data, {
       depsMap.set(key, deps)
     }
     deps.add(activeEffect)
-    return target[key]
+
+    return target[key];
   },
-  set(target, key, newVal) {
-    target[key] = newVal
+  set(target, key, val) {
+    target[key] = val;
     const depsMap = bucket.get(target)
     if(!depsMap) return
     const effects = depsMap.get(key)
     effects && effects.forEach(fn => fn())
-  }
-})
+    return true;
+  },
+});
 
-// 执行副作用函数，触发 get
-effect(() => {
-  console.log(obj.text)
-})
+////////////////////////////////////
+// 定义第一个副作用函数
+function effectText1() {
+  console.log("effect text 1", obj.text1);
+}
+
+function effectText2() {
+  console.log("effect text 2", obj.text2)
+}
+
+// 初始化依次执行副作用函数，触发 get
+effect(effectText1);
+effect(effectText2);
 
 // 模拟2s后修改数据
 setTimeout(() => {
-  obj.text2 = 'HELLO WORLD!'
-}, 2000)
+  obj.text2 = "HELLO WORLD 2";
+}, 2000);
