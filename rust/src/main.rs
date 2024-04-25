@@ -1,14 +1,9 @@
-fn main() {
-    let y = {
-        let x = 3;
-        x + 1
-    };
-    // println!("{}", y);
-    // println!("{}", add(1,2));
-
-    assert_eq!(add(1,2), ());
-
+fn add<T: std::ops::Add<Output = T>>(a:T, b:T) -> T {
+    a + b
 }
 
-fn add(x: i32, y: i32){
+fn main() {
+    println!("add i8: {}", add(2i8, 3i8));
+    // println!("add i32: {}", add(20, 30));
+    // println!("add f64: {}", add(1.23, 1.23));
 }
