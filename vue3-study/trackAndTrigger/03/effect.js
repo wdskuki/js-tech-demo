@@ -1,6 +1,8 @@
 // 存放副作用函数的集合容器。用Set数据结构，是为了防止相同的副作用函数重复收集
 const bucket = new Set();
 
+// effect.js
+
 // 表示当前正在运行的副作用函数
 let activeEffect = null;
 

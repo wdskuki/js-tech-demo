@@ -36,5 +36,5 @@ effect2();
 
 // 模拟2s后修改数据
 setTimeout(() => {
-  obj.text = 'HELLO WORLD'
-}, 2000)
+  obj.text = "HELLO WORLD";
+}, 2000);

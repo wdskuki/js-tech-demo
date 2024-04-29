@@ -1,3 +1,5 @@
+// effect.js
+
 // 存放副作用函数的集合容器，用Set数据结构，是为了防止相同的副作用函数重复收集
 const bucket = new WeakMap();
 
