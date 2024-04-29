@@ -40,7 +40,8 @@ const obj = new Proxy(data, {
 });
 
 function track(target, key){
-  if(!activeEffect) return
+  
+  if(!activeEffect || !shouldTrack) return
   let depsMap = bucket.get(target)
   if(!depsMap) {
     depsMap = new Map()
@@ -71,7 +72,9 @@ function trigger(target, key) {
 
   const effectsToRun = new Set(effects)
   effectsToRun.forEach(effectFn => effectFn())
+  // shouldTrack = false;
   // effects && effects.forEach(fn => fn())
+  // shouldTrack = true;
 }
 
 
