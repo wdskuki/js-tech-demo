@@ -1,7 +1,7 @@
 // debug.js
 
 import { myEffect, myReactive } from './effect.js'
-// 原始对象,包含两个属性
+// 原始对象
 const data = {
   value: 1,
 };
