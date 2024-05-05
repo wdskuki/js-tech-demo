@@ -10,7 +10,7 @@ let activeEffect = null;
 let effectStack = [];
 
 // 用于执行副作用函数的函数
-export function myEffect(fn) {
+export function myEffect(fn, options = {}) {
   const effectFn = () => {
     // 清除依赖
     cleanup(effectFn);
@@ -25,6 +25,8 @@ export function myEffect(fn) {
   };
   // 存储该副作用哦函数相关联的依赖
   effectFn.deps = []
+  // 将options挂载到effectFn上
+  effectFn.options = options
   effectFn();
 }
 
@@ -74,7 +76,13 @@ function trigger(target, key) {
       effectToRun.add(effectFn)
     }
   })
-  effectToRun && effectToRun.forEach(fn => fn())
+  effectToRun && effectToRun.forEach(fn => {
+    if(fn.options.scheduler) { // 判断是否有scheduler定义
+      fn.options.scheduler(fn)
+    }else {
+      fn()
+    }
+  })
 }
 
 function cleanup(effectFn) {

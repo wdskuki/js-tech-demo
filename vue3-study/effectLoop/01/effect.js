@@ -6,14 +6,25 @@ const bucket = new WeakMap();
 // 表示当前正在运行的副作用函数
 let activeEffect = null;
 
+// 副作用栈
+let effectStack = [];
+
 // 用于执行副作用函数的函数
 export function myEffect(fn) {
   const effectFn = () => {
-    cleanup(effectFn); // 每次运行副作用函数，清空和其他对象属性的关联关系
+    // 清除依赖
+    cleanup(effectFn);
+    // 执行副作用函数
     activeEffect = effectFn;
+
+    effectStack.push(activeEffect)
     fn();
+
+    effectStack.pop()
+    activeEffect = effectStack[effectStack.length - 1]
   };
-  effectFn.deps = []; // 用于保存该副作用函数所关联的对象属性
+  // 存储该副作用哦函数相关联的依赖
+  effectFn.deps = []
   effectFn();
 }
 
